@@ -32,9 +32,9 @@ def notify():
     client = Client(account_sid, auth_token)
 
     call = client.calls.create(
-            twiml='<Response><Say voice="alice">Hi surucha arora, there is an opening, get up from ur lazy ass and register for it before someone else does.Till the time you login, here is a song, love nicki</Say><Play>http://demo.twilio.com/docs/classic.mp3</Play></Response>',
-            to='+917988683350',
-            from_='+12564154635'
+            twiml='<Response><Say voice="alice">Hello Surucha Arora, hope there is a smile on the face of this cute little always aasli bachi,now get up and register for the course, and here is a song for my girl, love chit chiti. </Say><Play>https://pyaaribaarish.000webhostapp.com/ilysa.mp3</Play></Response>',
+                        to='+917988683350',
+                        from_='+12564154635'
                     )
                     
     print(call.sid)
