@@ -27,13 +27,13 @@ from twilio.rest import Client
 # Notify that a course is available
 def notify():
     account_sid = 'AC2d9b8d775c96813a62abded01b5c5120'
-    auth_token = '36962f21e324450d02699507007ceba3'
+    auth_token = 'c222be0981a90830cbac33f994b481bf'
 
     client = Client(account_sid, auth_token)
 
     call = client.calls.create(
             twiml='<Response><Say voice="alice">Hi surucha arora, there is an opening, get up from ur lazy ass and register for it before someone else does.Till the time you login, here is a song, love nicki</Say><Play>http://demo.twilio.com/docs/classic.mp3</Play></Response>',
-            to='+919466735758',
+            to='+917988683350',
             from_='+12564154635'
                     )
                     
