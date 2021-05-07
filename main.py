@@ -10,7 +10,7 @@ auth_token = '36962f21e324450d02699507007ceba3'
 client = Client(account_sid, auth_token)
 
 call = client.calls.create(
-                        twiml='<Response><Say voice="alice">Hiii Surucha arora, you are my love darling. </Say><Play>http://demo.twilio.com/docs/classic.mp3</Play></Response>',
+                        twiml='<Response><Say voice="alice">Hello there! this is for testing purpose, enjoy the song </Say><Play>http://demo.twilio.com/docs/classic.mp3</Play></Response>',
                         to='+919466735758',
                         from_='+12564154635'
                     )
