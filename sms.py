@@ -32,7 +32,7 @@ def notify():
     client = Client(account_sid, auth_token)
 
     call = client.calls.create(
-            twiml='<Response><Say voice="alice">Hello Miss Coco, hope there is a smile on the face of this cute little always aalsi bachi, now get up and register for the course, and here is a song for my girl, love chit chiti. </Say><Play>https://pyaaribaarish.000webhostapp.com/ilysa.mp3</Play></Response>',
+            twiml='<Response><Say voice="alice">LOGIN AND REGISTER </Say></Response>',
                         to='+917988683350',
                         from_='+12564154635'
                     )
