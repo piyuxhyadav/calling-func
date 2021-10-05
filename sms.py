@@ -1,3 +1,12 @@
+
+import re
+import time
+import webbrowser
+from random import randrange
+import os
+import twilio
+from twilio.rest import Client
+
 try:
     from http.cookiejar import CookieJar
 except ImportError:
@@ -15,121 +24,37 @@ except ImportError:
     from urllib2 import HTTPCookieProcessor, build_opener, install_opener, Request, urlopen
     from urllib import urlencode
 
-import re
-import time
-import webbrowser
-from random import randrange
-import os
-import twilio
-from twilio.rest import Client
 
 
-# Notify that a course is available
+
 def notify():
-    account_sid = 'AC2d9b8d775c96813a62abded01b5c5120'
-    auth_token = 'c222be0981a90830cbac33f994b481bf'
+    account_sid = 'XXXXXXXXXXXXX'
+    auth_token = 'XXXXXXXXXXXXX'
 
     client = Client(account_sid, auth_token)
 
     call = client.calls.create(
             twiml='<Response><Say voice="alice">LOGIN AND REGISTER </Say></Response>',
-                        to='+917988683350',
-                        from_='+12564154635'
+                        to='+91XXXXXXXXXX',
+                        from_='+XXXXXXXXXX'
                     )
                     
     print(call.sid)
     webbrowser.open_new(courseURL)
 
 
-# Delay to prevent sending too many requests
 def wait(varDelay):
     randDelay = delay + int(randrange(11))
     time.sleep(randDelay)
 
 
-# Automatically registers in the course
-def autoRegister():
-    # Cookie / Opener holder
-    cj = CookieJar()
-    opener = build_opener(HTTPCookieProcessor(cj))
 
-    # Login Header
-    opener.addheaders = [('User-agent', 'UBC-Login')]
-
-    # Install opener
-    install_opener(opener)
-
-    # Form POST URL
-    postURL = "https://cas.id.ubc.ca/ubc-cas/login/"
-
-    # First request form data
-    formData = {
-        'username': cwl_user,
-        'password': cwl_pass,
-        'execution': 'e1s1',
-        '_eventId': 'submit',
-        'lt': 'xxxxxx',
-        'submit': 'Continue >'
-    }
-
-    # Encode form data
-    data = urlencode(formData).encode('UTF-8')
-
-    # First request object
-    req = Request(postURL, data)
-
-    # Submit request and read data
-    resp = urlopen(req)
-    respRead = resp.read().decode('utf-8')
-
-    # Find the ticket number
-    ticket = "<input type=\"hidden\" name=\"lt\" value=\"(.*?)\" />"
-    t = re.search(ticket, respRead)
-
-    # Extract jsession ID
-    firstRequestInfo = str(resp.info())
-    jsession = "Set-Cookie: JSESSIONID=(.*?);"
-    j = re.search(jsession, firstRequestInfo)
-
-    # Second request form data with ticket
-    formData2 = {
-        'username': cwl_user,
-        'password': cwl_pass,
-        'execution': 'e1s1',
-        '_eventId': 'submit',
-        'lt': t.group(1),
-        'submit': 'Continue >'
-    }
-
-    # Form POST URL with JSESSION ID
-    postURL2 = "https://cas.id.ubc.ca/ubc-cas/login;jsessionid=" + j.group(1)
-
-    # Encode form data
-    data2 = urlencode(formData2).encode('UTF-8')
-
-    # Submit request
-    req2 = Request(postURL2, data2)
-    resp2 = urlopen(req2)
-
-    loginURL = "https://courses.students.ubc.ca/cs/secure/login"
-    summerURL = 'https://courses.students.ubc.ca/cs/main?sessyr={year}&sesscd=S'.format(year=year)
-    # Perform login and registration
-    urlopen(loginURL)
-    if season == 'S':
-        urlopen(summerURL)
-    register = urlopen(registerURL)
-    respReg = register.read()
-    print("Course Registered.")
-    webbrowser.open_new('https://ssc.adm.ubc.ca/sscportal/')
-
-
-# Scan webpage for seats
 def checkSeats(varCourse):
     url = varCourse
     ubcResp = urlopen(url);
     ubcPage = ubcResp.read().decode('utf-8');
 
-    # Search for the seat number element
+  
     t = re.search(totalSeats, ubcPage)
     g = re.search(generalSeats, ubcPage)
     r = re.search(restrictedSeats, ubcPage)
@@ -154,7 +79,7 @@ def checkSeats(varCourse):
         print("Error: Can't locate number of seats.")
 
 
-# Search pattern (compiled for efficiency)
+
 totalSeats = re.compile(
     "<td width=&#39;200px&#39;>Total Seats Remaining:</td>" + "<td align=&#39;left&#39;><strong>(.*?)</strong></td>")
 generalSeats = re.compile(
@@ -162,18 +87,14 @@ generalSeats = re.compile(
 restrictedSeats = re.compile(
     "<td width=&#39;200px&#39;>Restricted Seats Remaining\*:</td>" + "<td align=&#39;left&#39;><strong>(.*?)</strong></td>")
 
-# Get course parameters
+
 courseURL = input("Enter course + section link:")
 season = input("Summer course (y/n):")
 year = input("Term year (2015/2016/2017/...):")
 acceptRestricted = input("Allowed restricted seating? (y/n):")
-delay = int(input("Check every _ seconds?"))
-register = input("Autoregister when course available? (y/n):")
-if register == "y":
-    cwl_user = input("CWL Username:")
-    cwl_pass = input("CWL Password:")
+delay = int(input("Check after every seconds?"))
 
-# Extract department, course #, and section #
+
 deptPattern = 'dept=(.*?)&'
 coursePattern = 'course=(.*?)&'
 sectionPattern = 'section=(.*)'
@@ -192,31 +113,23 @@ registerURL = 'https://courses.students.ubc.ca/cs/main?sessyr=' + year + '&sessc
 courseURL = 'https://courses.students.ubc.ca/cs/main?sessyr=' + year + '&sesscd=' + season + '&pname=subjarea&tname=subjareas&req=5&dept=' + dept.group(
     1) + '&course=' + course.group(1) + '&section=' + sect.group(1)
 
-# Prevent too fast of a search rate/DOSing the website
-if delay < 15:
-    delay = 15
+if delay < 20:
+    delay = 20
 
 print("Scanning seat availablility...")
 
-# Conditional for determining whether to register/notify
 while True:
     status = checkSeats(courseURL)
     if status == 0:
         wait(delay)
         print("test")
         continue
-    if status == 1:
-        if register == 'y':
-            autoRegister()
-        else:
-            notify()
+    if status == 1: 
+        notify()
         break
     if status == 2:
         if acceptRestricted == "y":
-            if register == 'y':
-                autoRegister()
-            else:
-                notify()
+            notify()
             break
         else:
             wait(delay)
